@@ -1,2 +1,0 @@
-Grupa-Informatykoq
-==================
