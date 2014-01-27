@@ -1,0 +1,453 @@
+#include <cstdlib>
+#include <iostream>
+#include <conio.h>
+#include <fstream>
+#include <stdio.h>
+#include <iomanip>
+//////////////////w pliku tekstowym 0 to bledna odpowiedz, 1 to poprawna
+
+using namespace std;
+int gotowka=1000000; //milion do grania
+int strata=0; //stracona gotowka w danym pytaniu
+int licznik=0; //licznik do tablicy
+int numer_pytania=0; //licznik numeru pytania
+int lp=0; //liczba pytan
+
+/////////////////struktura-klasa do bazy pytan
+class baza_pytan
+{
+	public:
+	char pytanie[100];
+	char odp1[20];
+	unsigned int pop1;
+	char odp2[20];
+	unsigned int pop2;
+	char odp3[20];
+	unsigned int pop3;
+	char odp4[20];
+	unsigned int pop4;
+};
+baza_pytan tablica[20];
+
+////////////////////////struktura-klasa do obstawianej gotowki
+class obstawiana_gotowka
+{
+	public:
+	unsigned int kasa1;
+	unsigned int kasa2;
+	unsigned int kasa3;
+	unsigned int kasa4;
+};
+obstawiana_gotowka kasa[4];
+
+//////////////////jedziemy
+void teleturniej()
+{
+	int menu;
+	
+	do
+	{
+		///////////////menu
+		system("CLS");
+		cout<<"-----POSTAW NA MILION!-----"<<endl;
+		cout<<"1. Rozpocznij gre"<<endl;
+		cout<<"2. Zasady gry"<<endl;
+		cout<<"3. Info"<<endl;
+		cout<<"0. Zakoncz"<<endl;
+	
+		//////////////bezposrednie pobieranie 1 lub 0 w menu
+		menu=getch();
+		switch(menu)
+		{
+			case 49:
+			{
+					gotowka=1000000; //gracz dostaje miliona
+					numer_pytania=0; //zerowanie numeru pytania
+				
+				///ile pytan ma byc	
+				do
+				{
+					system("CLS");
+					cout<<"Na ile pytan chcesz odpowiedziec? Minimalnie 3, maksymalnie 10 pytan."<<endl;
+					cin>>lp;
+					
+					if (lp<3 || lp>10)
+					{
+						system("CLS");
+						cout<<"Na ile pytan chcesz odpowiedziec? Minimalnie 3, maksymalnie 10 pytan."<<endl;
+						cout<<"Musisz podac cyfre z podanego wyzej zakresu"<<endl;
+						system("pause");
+					}
+				}while(lp<3 || lp>10);
+				
+				///////////////////////////////odczyt z pliku
+				ifstream odczyt("pytania.txt");
+				for(licznik=0;licznik<lp;licznik++)
+					{
+						odczyt>>tablica[licznik].pytanie;
+						odczyt>>tablica[licznik].odp1;
+						odczyt>>tablica[licznik].pop1;
+						odczyt>>tablica[licznik].odp2;
+						odczyt>>tablica[licznik].pop2;
+						odczyt>>tablica[licznik].odp3;
+						odczyt>>tablica[licznik].pop3;
+						odczyt>>tablica[licznik].odp4;
+						odczyt>>tablica[licznik].pop4;
+					}
+				odczyt.close();
+				
+				///////////zerowanie licznika
+				licznik=0;
+				
+				do
+				{	
+					//////////////////////////////zwiekszanie licznika numeru pytania
+					numer_pytania=numer_pytania+1;	
+					
+					///////////////te 3 ify to sprawdzanie ktore to jest pytanie
+					if (licznik==0)
+					{
+						system("CLS");
+						cout<<"Pora na pierwsze pytanie, czy jestes gotowy?"<<endl;
+						system("pause");
+					}
+		
+					if (licznik!=0 && licznik!=lp)
+					{
+						system("CLS");
+						cout<<"Pora na nastepne pytanie, czy jestes gotowy?"<<endl;
+						system("pause");
+					}
+	
+					if (licznik==lp)
+					{
+						system("CLS");
+						cout<<"Pora na ostatnie pytanie, czy jestes gotowy?"<<endl;
+						system("pause");
+					}
+					
+					///////////////do naliczenia roznicy potem
+					strata=gotowka;
+					
+					//////////////wyswietlanie pytania i odpowiedzi
+					system("CLS");
+					cout<<tablica[licznik].pytanie<<endl;
+					cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<endl;
+					cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<endl;
+					cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<endl;
+					cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<endl;
+					cout<<endl;
+					cout<<"Aby obstawic i ";
+					system("pause");
+	
+					///petla do powtorzenia po obstawieniu wiekszej gotowki niz sie posiada
+					do
+					{
+						system("CLS");
+						cout<<tablica[licznik].pytanie<<endl;
+						cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<endl;
+						cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<endl;
+						cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<endl;
+						cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<endl;
+						cout<<endl;
+						
+						//////////////obstawianie na pierwsza odpowiedz
+						cout<<"Ile chcesz postawic na pierwsza odpowiedz '"<<tablica[licznik].odp1<<"'?"<<endl;
+						cout<<"Musisz rozdysponowac cala gotowke."<<endl;
+						cout<<"Masz do dyspozycji "<<gotowka<<"zl."<<endl;
+						cin>>kasa[1].kasa1;
+						
+						//////////////////////////sprawdzanie czy gracz obstawil wiecej niz ma
+						if (kasa[1].kasa1>gotowka)
+						{
+							system("CLS");
+							cout<<"Nie mozesz obstawic wiecej niz posiadasz!"<<endl;
+							system("pause");
+						}
+					}while(kasa[1].kasa1>gotowka);
+					
+					//////////////////////////////zmniejszanie dostepnej gotowki do obstawiania
+					gotowka=gotowka-kasa[1].kasa1;
+			
+					///////////////sprawdzanie czy dostepna gotowka jest wieksza niz 0
+					if (gotowka!=0)
+					{
+						///petla do powtorzenia po obstawieniu wiekszej gotowki niz sie posiada
+						do
+						{
+							system("CLS");
+							cout<<tablica[licznik].pytanie<<endl;
+							cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+							cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<endl;
+							cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<endl;
+							cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<endl;
+							cout<<endl;
+							
+							//////////////obstawianie na druga odpowiedz
+							cout<<"Ile chcesz postawic na druga odpowiedz '"<<tablica[licznik].odp2<<"'?"<<endl;
+							cout<<"Musisz rozdysponowac cala gotowke."<<endl;
+							cout<<"Masz do dyspozycji "<<gotowka<<"zl."<<endl;
+							cin>>kasa[1].kasa2;
+							
+							//////////////////////////sprawdzanie czy gracz obstawil wiecej niz ma
+							if (kasa[1].kasa2>gotowka)
+							{
+								system("CLS");
+								cout<<"Nie mozesz obstawic wiecej niz posiadasz!"<<endl;
+								system("pause");
+							}
+						}while(kasa[1].kasa2>gotowka);
+					
+					//////////////////////////////zmniejszanie dostepnej gotowki do obstawiania
+					gotowka=gotowka-kasa[1].kasa2;
+					
+					//////////////////////////sprawdzanie czy gracz obstawil wiecej niz ma
+					if (gotowka!=0)
+					{
+						///petla do powtorzenia po obstawieniu wiekszej gotowki niz sie posiada
+						do
+						{
+							system("CLS");
+							cout<<tablica[licznik].pytanie<<endl;
+							cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+							cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<" - "<<kasa[1].kasa2<<"zl"<<endl;
+							cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<endl;
+							cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<endl;
+							cout<<endl;
+							
+							//////////////obstawianie na trzecia odpowiedz
+							cout<<"Ile chcesz postawic na trzecia odpowiedz '"<<tablica[licznik].odp3<<"'?"<<endl;
+							cout<<"Musisz rozdysponowac cala gotowke."<<endl;
+							cout<<"Masz do dyspozycji "<<gotowka<<"zl."<<endl;
+							cin>>kasa[1].kasa3;
+			
+							//////////////////////////sprawdzanie czy gracz obstawil wiecej niz ma
+							if (kasa[1].kasa3>gotowka)
+							{
+								system("CLS");
+								cout<<"Nie mozesz obstawic wiecej niz posiadasz!"<<endl;
+								system("pause");
+							}
+						}while(kasa[1].kasa3>gotowka);
+	
+					//////////////////////////////zmniejszanie dostepnej gotowki do obstawiania
+					gotowka=gotowka-kasa[1].kasa3;
+	
+					//////////////////////////sprawdzanie czy gracz posiada jeszcze jakas gotowke
+					if (gotowka!=0)
+					{
+						system("CLS");
+						cout<<tablica[licznik].pytanie<<endl;
+						cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+						cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<" - "<<kasa[1].kasa2<<"zl"<<endl;
+						cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<" - "<<kasa[1].kasa3<<"zl"<<endl;
+						cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<" - "<<gotowka<<"zl"<<endl;
+						cout<<endl;
+						
+						cout<<"Pozostala kwota w wysokosci "<<gotowka<<"zl zostala automatycznie postawiona na ostatnia odpowiedz '"<<tablica[licznik].odp4<<"'."<<endl;
+						system("pause");
+						
+						//////////////////////automatyczne obstawienie pozostalej gotowki
+						kasa[1].kasa4=gotowka;
+						//////////////////////////////zmniejszanie dostepnej gotowki do obstawiania
+						gotowka=gotowka-kasa[1].kasa4;
+					}
+					}
+					}
+	
+				//////////////informacja o rozdysponowaniu calej gotowki
+				if (kasa[1].kasa4==0)
+				{
+					system("CLS");
+					cout<<tablica[licznik].pytanie<<endl;
+					cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+					cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<" - "<<kasa[1].kasa2<<"zl"<<endl;
+					cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<" - "<<kasa[1].kasa3<<"zl"<<endl;
+					cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<" - "<<kasa[1].kasa4<<"zl"<<endl;
+					cout<<endl;
+					cout<<"Cala kwota zostala rozdysponowana, nie posiadasz juz wiecej gotowki."<<endl;
+					system("pause");
+				}
+	
+				//////////////tryb zapadni
+				system("CLS");
+				cout<<"Pytanie brzmialo: "<<tablica[licznik].pytanie<<endl;
+				cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+				cout<<"Zapadnia 2 - "<<tablica[licznik].odp2<<" - "<<kasa[1].kasa2<<"zl"<<endl;
+				cout<<"Zapadnia 3 - "<<tablica[licznik].odp3<<" - "<<kasa[1].kasa3<<"zl"<<endl;
+				cout<<"Zapadnia 4 - "<<tablica[licznik].odp4<<" - "<<kasa[1].kasa4<<"zl"<<endl;
+				cout<<endl;
+				
+				cout<<"Aby poznac prawidlowa odpowiedz i ";
+				system("pause");
+	
+				////////////////////////////mnozenie obstawionej gotowki o wartosci odpowiedzi w systemie zerojedynkowym
+				kasa[1].kasa1=kasa[1].kasa1*tablica[licznik].pop1;
+				kasa[1].kasa2=kasa[1].kasa2*tablica[licznik].pop2;
+				kasa[1].kasa3=kasa[1].kasa3*tablica[licznik].pop3;
+				kasa[1].kasa4=kasa[1].kasa4*tablica[licznik].pop4;
+				////////////////////////////zsumowanie zdobytej gotowki
+				gotowka=kasa[1].kasa1+kasa[1].kasa2+kasa[1].kasa3+kasa[1].kasa4;
+				//////////////////////odliczenie roznicy miedzy cala gotowka a wygrana
+				strata=strata-gotowka;
+	
+				//////////////////////////////ify sprawdzaja ktora odpowiedz jest poprawna
+				if (tablica[licznik].pop1==1)
+				{	
+					//////////////tryb zapadni - wyswietlanie tylko poprawnej odpowiedzi
+					system("CLS");
+					cout<<"Pytanie brzmialo: "<<tablica[licznik].pytanie<<endl;
+					cout<<"Zapadnia 1 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa1<<"zl"<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<endl;
+					system("pause");
+					
+					//////////////nowy ekran ze statystykami
+					system("CLS");
+					cout<<"Wygrales "<<gotowka<<"zl."<<endl;
+					cout<<"Straciles "<<strata<<"zl."<<endl;
+					system("pause");
+				}
+				
+				if (tablica[licznik].pop2==1)
+				{		
+					//////////////tryb zapadni - wyswietlanie tylko poprawnej odpowiedzi
+					system("CLS");
+					cout<<"Pytanie brzmialo: "<<tablica[licznik].pytanie<<endl;
+					cout<<endl;
+					cout<<"Zapadnia 2 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa2<<"zl"<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<endl;
+					system("pause");
+					
+					//////////////nowy ekran ze statystykami
+					system("CLS");
+					cout<<"Wygrales "<<gotowka<<"zl."<<endl;
+					cout<<"Straciles "<<strata<<"zl."<<endl;
+					system("pause");
+				}
+				
+				if (tablica[licznik].pop3==1)
+				{	
+					//////////////tryb zapadni - wyswietlanie tylko poprawnej odpowiedzi
+					system("CLS");
+					cout<<"Pytanie brzmialo: "<<tablica[licznik].pytanie<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<"Zapadnia 3 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa3<<"zl"<<endl;
+					cout<<endl;
+					cout<<endl;
+					system("pause");
+					
+					//////////////nowy ekran ze statystykami
+					system("CLS");
+					cout<<"Wygrales "<<gotowka<<"zl."<<endl;
+					cout<<"Straciles "<<strata<<"zl."<<endl;
+					system("pause");
+				}
+				
+				if (tablica[licznik].pop4==1)
+				{	
+					//////////////tryb zapadni - wyswietlanie tylko poprawnej odpowiedzi
+					system("CLS");
+					cout<<"Pytanie brzmialo: "<<tablica[licznik].pytanie<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<endl;
+					cout<<"Zapadnia 4 - "<<tablica[licznik].odp1<<" - "<<kasa[1].kasa4<<"zl"<<endl;
+					cout<<endl;
+					system("pause");
+					
+					//////////////nowy ekran ze statystykami
+					system("CLS");
+					cout<<"Wygrales "<<gotowka<<"zl."<<endl;
+					cout<<"Straciles "<<strata<<"zl."<<endl;
+					system("pause");
+				}
+				
+				////////////////zerowanie obstawionych kwot
+				kasa[1].kasa1=0;
+				kasa[1].kasa2=0;
+				kasa[1].kasa3=0;
+				kasa[1].kasa4=0;
+				//////////////////zwiekszenie licznika
+				licznik=licznik+1;
+	
+				}while(gotowka>0 && numer_pytania<lp);
+	
+			///////////////sprawdzanie czy gracz ma jeszcze gotowke
+			if (gotowka<=0)
+			{
+				system("CLS");
+				cout<<"Przegrales cala gotowke, koniec gry."<<endl;
+				cout<<endl;
+				cout<<"<= Powrot do menu"<<endl;
+				system("pause");
+			}
+			
+			/////////////////////////////////sprawdzanie czy to jest juz koniec pytan
+			if (numer_pytania<4 && gotowka>0)
+			{
+			system("CLS");
+				cout<<"Koniec pytan."<<endl;
+				cout<<"Wygrales "<<gotowka<<"zl."<<endl;
+				cout<<endl;
+				cout<<"<= Powrot do menu"<<endl;
+				system("pause");
+			}
+			
+			break;
+			}
+			
+		case 50:
+		{	//////////////zasady programu
+			system("CLS");
+			cout<<"Zasady programu:"<<endl;
+			cout<<"Gra polega na obstawianiu gotowki na zapadnie z odpowiedziami."<<endl;
+			cout<<"Gracz dostaje na poczatek do dyspozycji milion zlotych, ktore moze rozdysponowac w dowolny sposob."<<endl;
+			cout<<"W przypadku gdy gracz przegra cala gotowke gra zostaje zakonczona."<<endl;
+			cout<<"Zyczymy udanej zabawy!"<<endl;
+			cout<<endl;
+			cout<<"<= Powrot do menu"<<endl;
+			system("pause");
+			break;
+		}
+		
+		case 51:
+		{	//////////////informacje
+			system("CLS");
+			cout<<"Gra: 'Postaw na milion'"<<endl;
+			cout<<endl;
+			cout<<"Tworcy gry:"<<endl;
+			cout<<"- Kamil Ciesielczyk"<<endl;
+			cout<<"- Mateusz Maslowski"<<endl;
+			cout<<"- Bartlomiej Urbanczyk"<<endl;
+			cout<<"Grupa: 3/4AZI"<<endl;
+			cout<<endl;
+			cout<<"Baze pytan mozna zakupic u nas w wysokosci 1zl. Dostepne w sprzedazy od 1.02.2014r."<<endl;
+			cout<<endl;
+			cout<<"<= Powrot do menu"<<endl;
+			system("pause");
+			break;
+		}
+			
+		case 48:
+		{	//////////////koniec programu
+			system("CLS");
+			cout<<"Dziekujemy za gre."<<endl;
+			break;
+		}
+		}
+	}while(menu!=48);
+};
+
+
+int main()
+{
+	teleturniej();
+}
+
+
